@@ -27,7 +27,6 @@ A ready-to-use LLM application development environment for VS Code. Includes **L
 | **Vector Store** | ChromaDB, sentence-transformers |
 | **Tools** | Gradio, accelerate, datasets, tiktoken |
 
-> **No NVIDIA GPU?** Use the CPU devcontainer configuration at `.devcontainer/cpu/devcontainer.json`
 
 ## Project structure
 
@@ -41,9 +40,8 @@ llms-devcontainer/
 ├── data/                       # Store datasets here
 ├── logs/                       # Training/experiment logs
 ├── models/                     # Saved model files
-├── notebooks/
-│   ├── environment_test.ipynb  # Verify your setup
-│   └── functions/              # Helper modules for notebooks
+├── src/
+│   └── environment_test.py     # Verify your setup
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -92,7 +90,7 @@ Check your GPU's compute capability: [NVIDIA CUDA GPUs](https://developer.nvidia
 4. **Open Folder in Container** from the VS Code command palette (Ctrl+Shift+P), start typing `Open Folder in`...
    - Select the **GPU** or **CPU** configuration when prompted
 
-5. **Verify** by running `notebooks/environment_test.ipynb`
+5. **Verify** by running `python src/environment_test.py`
 
 ## Using as a template for new projects
 
@@ -113,12 +111,6 @@ You can use your fork as a template to quickly create new LLM application projec
 5. **Clone** your new repository:
    ```bash
    git clone https://github.com/<your-username>/my-new-project.git
-   ```
-6. **Clean up** (optional): Remove the example notebooks, then add your own code:
-   ```bash
-   rm -rf notebooks/*.ipynb
-   git add -A && git commit -m "Initial project setup"
-   git push
    ```
 
 Now you have a fresh LLM application project with the dev container configuration ready to go!
