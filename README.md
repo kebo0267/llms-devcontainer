@@ -1,28 +1,45 @@
-# Deep learning GPU development environment
+# LLM Application Development Environment
 
-A ready-to-use deep learning environment with NVIDIA GPU support for VS Code. Includes both **PyTorch** and **TensorFlow** frameworks. Designed for cross-platform support and wide GPU compatibility.
+A ready-to-use LLM application development environment for VS Code. Includes **LangChain**, **LlamaIndex**, **Hugging Face Transformers**, **vLLM** (GPU only), and API clients for OpenAI and Anthropic. Available in both GPU and CPU-only configurations.
 
 ## What's included
 
-| Category | Versions |
-|----------|----------|
-| **GPU** | CUDA 12.5, cuDNN 9.1 |
-| **ML** | PyTorch 2.10, TensorFlow 2.16, Keras 3.3, Scikit-learn 1.4 |
-| **Python** | Python 3.10, NumPy 1.24, Pandas 2.2, Matplotlib 3.10 |
-| **Tools** | JupyterLab, TensorBoard, Optuna |
+### GPU Environment
 
-Based on [NVIDIA's TensorFlow 24.06 container](https://docs.nvidia.com/deeplearning/frameworks/tensorflow-release-notes/rel-24-06.html).
+| Category | Details |
+|----------|---------|
+| **Base Image** | NVIDIA PyTorch 24.08 |
+| **GPU** | CUDA 12.6, PyTorch 2.4 (GPU-enabled) |
+| **Python** | 3.10 |
+| **LLM Frameworks** | LangChain, LlamaIndex, Transformers, smolagents, vLLM |
+| **API Clients** | OpenAI, Anthropic, Ollama |
+| **Vector Store** | ChromaDB, sentence-transformers |
+| **Tools** | Gradio, accelerate, datasets, tiktoken |
 
-> **No NVIDIA GPU?** Use the CPU version instead: [gperdrizet/deeplearning-CPU](https://github.com/gperdrizet/deeplearning-CPU)
+### CPU Environment
+
+| Category | Details |
+|----------|---------|
+| **Base Image** | Python 3.11-slim |
+| **Python** | 3.11, PyTorch (CPU) |
+| **LLM Frameworks** | LangChain, LlamaIndex, Transformers, smolagents |
+| **API Clients** | OpenAI, Anthropic, Ollama |
+| **Vector Store** | ChromaDB, sentence-transformers |
+| **Tools** | Gradio, accelerate, datasets, tiktoken |
+
+> **No NVIDIA GPU?** Use the CPU devcontainer configuration at `.devcontainer/cpu/devcontainer.json`
 
 ## Project structure
 
 ```
-tensorflow-GPU/
+llms-devcontainer/
 ├── .devcontainer/
-│   └── devcontainer.json       # Dev container configuration
+│   ├── gpu/
+│   │   └── devcontainer.json   # GPU dev container configuration
+│   └── cpu/
+│       └── devcontainer.json   # CPU dev container configuration
 ├── data/                       # Store datasets here
-├── logs/                       # TensorBoard logs
+├── logs/                       # Training/experiment logs
 ├── models/                     # Saved model files
 ├── notebooks/
 │   ├── environment_test.ipynb  # Verify your setup
@@ -34,15 +51,20 @@ tensorflow-GPU/
 
 ## Requirements
 
+### GPU Environment
 - **NVIDIA GPU** (Pascal or newer) with driver ≥545
 - **Docker** with GPU support ([Windows](https://docs.docker.com/desktop/setup/install/windows-install) | [Linux](https://docs.docker.com/desktop/setup/install/linux))
 - **VS Code** with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 > **Linux users:** Also install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
+### CPU Environment
+- **Docker** ([Windows](https://docs.docker.com/desktop/setup/install/windows-install) | [Linux](https://docs.docker.com/desktop/setup/install/linux))
+- **VS Code** with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
 ### GPU compatibility
 
-This environment requires an NVIDIA GPU with **compute capability 6.0+** (Pascal architecture or newer):
+The GPU environment requires an NVIDIA GPU with **compute capability 6.0+** (Pascal architecture or newer):
 
 | Architecture | Example GPUs | Compute Capability |
 |--------------|--------------|-------------------|
@@ -56,28 +78,25 @@ This environment requires an NVIDIA GPU with **compute capability 6.0+** (Pascal
 
 Check your GPU's compute capability: [NVIDIA CUDA GPUs](https://developer.nvidia.com/cuda-gpus)
 
-> **Note:** This environment is configured for broad GPU compatibility, supporting Pascal and newer architectures. If you have a more recent GPU (e.g. Ada Lovelace, Hopper, or Blackwell), you may benefit from using a newer CUDA version to access the latest performance optimizations and features. Consider setting up a custom environment with an updated [NVIDIA TensorFlow container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorflow) to take full advantage of your hardware.
-
 ## Quick start
-
-To quickly try the container environment out on your system do the following. If you want to use it for your own project, see below.
 
 1. **Fork** this repository (click "Fork" button above)
 
 2. **Clone** your fork:
    ```bash
-   git clone https://github.com/<your-username>/deeplearning-GPU.git
+   git clone https://github.com/<your-username>/llms-devcontainer.git
    ```
 
 3. **Open VS Code**
 
-4. **Open Folder in Container** from the VS Code command pallet (Ctrl+shift+p), start typing `Open Folder in`...
+4. **Open Folder in Container** from the VS Code command palette (Ctrl+Shift+P), start typing `Open Folder in`...
+   - Select the **GPU** or **CPU** configuration when prompted
 
 5. **Verify** by running `notebooks/environment_test.ipynb`
 
 ## Using as a template for new projects
 
-You can use your fork as a template to quickly create new deep learning projects:
+You can use your fork as a template to quickly create new LLM application projects:
 
 ### One-time setup: Make your fork a template
 
@@ -102,7 +121,7 @@ You can use your fork as a template to quickly create new deep learning projects
    git push
    ```
 
-Now you have a fresh deep learning GPU project with the dev container configuration ready to go!
+Now you have a fresh LLM application project with the dev container configuration ready to go!
 
 ## Adding Python packages
 
@@ -122,11 +141,11 @@ For persistent packages that survive container rebuilds:
 
 1. **Create** a `requirements.txt` file in the repository root:
    ```
-   scikit-image==0.22.0
-   plotly
+   langchain-community
+   faiss-cpu
    ```
 
-2. **Update** `.devcontainer/devcontainer.json` to install packages on container creation by adding a `postCreateCommand`:
+2. **Update** the appropriate `.devcontainer/*/devcontainer.json` to install packages on container creation by adding a `postCreateCommand`:
    ```json
    "postCreateCommand": "pip install -r requirements.txt"
    ```
@@ -135,27 +154,27 @@ For persistent packages that survive container rebuilds:
 
 Now your packages will be automatically installed whenever the container is created.
 
-## TensorBoard
+## Gradio Web UI
 
-To launch TensorBoard:
+Both environments include Gradio for building interactive demos. To run a Gradio app:
 
-1. Open the command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. Run **Python: Launch TensorBoard**
-3. Select the `logs/` directory when prompted
+```python
+import gradio as gr
 
-TensorBoard will open in a new tab within VS Code. Place your training logs in the `logs/` directory.
+def greet(name):
+    return f"Hello, {name}!"
 
-## Optuna dashboard
+demo = gr.Interface(fn=greet, inputs="text", outputs="text")
+demo.launch(server_name="0.0.0.0")
+```
 
-Access the Optuna dashboard by right clicking on your Optuna database file and selecting 'Open in Optuna Dashboard'.
-
-> Note: the default ports for TensorBoard and Optuna are published by the container, so you can also run them via their respective built in web servers and they will be avalible on the host's localhost.
+The default Gradio port (7860) is accessible from your host machine.
 
 ## Keeping your fork updated
 
 ```bash
 # Add upstream (once)
-git remote add upstream https://github.com/gperdrizet/deeplearning-GPU.git
+git remote add upstream https://github.com/gperdrizet/llms-devcontainer.git
 
 # Sync
 git fetch upstream
@@ -168,6 +187,8 @@ git merge upstream/main
 |---------|----------|
 | Docker won't start | Enable virtualization in BIOS |
 | Permission denied (Linux) | Add user to docker group, then log out/in |
-| GPU not detected | Update NVIDIA drivers (≥545) |
+| GPU not detected | Update NVIDIA drivers (≥545), install NVIDIA Container Toolkit |
 | Container build fails | Check internet connection |
+| vLLM not available | vLLM requires GPU; use the GPU devcontainer |
+| Module not found | Rebuild container after adding to requirements.txt |
 
